@@ -1,0 +1,14 @@
+
+
+git clone https://github.com/DAnomaly/SHOESFLY.git
+
+
+
+
+git checkout -b [브랜치명]
+
+git add .
+
+git commit -m ''
+
+git push origin [브랜치명]

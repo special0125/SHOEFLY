@@ -1,0 +1,145 @@
+@charset "UTF-8";
+
+/* section */
+section {
+	margin-top: 30px;
+}
+
+section input, select, button {
+	background: none;
+	border: none;
+	outline: none;
+}
+
+/* title : h2 */
+section h2 {
+	border-bottom: 1px solid #adbac790;
+	padding: 10px 0;
+	padding-left: 30px;
+}
+section h2 a {
+	color: #539bf5;
+	font-size: 22px;
+	text-decoration: none;
+}
+
+/* h3 */
+section h3 {
+	margin: 20px 10px;
+	padding: 10px;
+	border-bottom: 1px solid #adbac790;
+	color: #539bf5bc;
+}
+
+
+/* search */
+section form {
+	display: inline-block;
+	border-bottom: 1px solid #adbac790;
+	padding: 5px;
+	box-sizing: border-box;
+}
+section form input[type="date"] {
+	font-size: 13px;
+	width: 128px;
+}
+section form div {
+	display: inline-block;
+}
+section form input[type="text"] {
+	border-bottom: 1px solid #adbac790;
+	margin: 5px;
+	padding: 5px;
+}
+section form > input {
+	color: #539bf5bc;
+}
+section form > input:hover {
+	color: #539bf5;
+}
+
+/* div.write */
+section div.write {
+	display: inline-block;
+	border-bottom: 1px solid #adbac790;
+	margin-left: 30px;
+	padding: 5px;
+	box-sizing: border-box;
+	height: 30px;
+}
+section div.write:hover {
+	border-bottom: 3px solid #adbac790;
+}
+section div.write:hover input {
+	cursor: pointer;
+	color: #adbac790; 
+}
+
+/* table */
+section table {
+	margin: 10px;
+	border: 1px solid #adbac760;
+	border-radius: 5px;
+	border-collapse: collapse;
+	text-align: center;
+}
+section table a {
+	text-decoration: none;
+	color: #539bf5;
+}
+section table a:hover {
+	cursor: pointer;
+	color: #539bf5bc;
+}
+section table tr {
+	border-bottom: 1px solid #adbac760;
+}
+section table th, section table td {
+	box-sizing: border-box;
+	padding: 10px;
+	margin: 0;
+}
+section table th {
+	font-weight: normal;
+	color: #d6dce2;
+}
+section table td {
+	box-sizing: border-box;;
+}
+section table td:nth-of-type(1) { width: 150px; }
+section table td:nth-of-type(2) { width: 480px; }
+section table td:nth-of-type(3) { width: 210px; }
+section table td:nth-of-type(4) { width: 100px; }
+section table td:nth-of-type(5) { width: 80px; }
+section table td:nth-of-type(6) { width: 80px; }
+section table tbody tr:hover td {
+	background-color: #323943;
+}
+section table input[type="button"], section table button {
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: bold;
+}
+section table input[type="button"]:hover, section table button:hover {
+	color: #539bf5bc;
+}
+
+/* tfoot */
+section tfoot {
+	text-align: center;
+}
+section tfoot span i {
+	color: #adbac750;
+}
+section tfoot span {
+	display: inline-block;
+	color: #adbac750;
+	margin: 0 30px;
+}
+section tfoot a {
+	display: inline-block;
+	margin: 0 30px;
+}
+section tfoot a:hover, section tfoot a:hover i {
+	color: #8296aa;
+}

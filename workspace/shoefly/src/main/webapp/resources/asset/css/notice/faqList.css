@@ -1,0 +1,115 @@
+@charset "UTF-8";
+
+/* SECTION */
+section {
+	width: 820px;
+	margin: 0 auto;
+}
+
+/* TITLE */
+section h2 {
+	margin-top: 60px;
+	padding-left: 10px;
+	text-align: left;
+}
+section h2 a {
+	color: #FFBEBE;
+	text-decoration: none; 
+}
+
+/* SEARCH */
+section .search {
+	width: 820px;
+	margin: 10px auto;
+	text-align: right;
+}
+section .search form {
+	display: inline-block;
+	border: 2px solid #FFBEBE;
+	border-radius: 3px;
+	padding: 4px;
+}
+section .search input, section .search button {
+	border: none;
+	background: none;
+}
+section .search button {
+ 	color: #FFBEBE; 
+}
+/* CONTENT */
+section .content {
+	border-collapse: collapse;
+	font-size: 15px;
+	text-align: center;
+	box-sizing: border-box;
+	margin: 0 auto;
+	background-color: #D5C2EE40;
+}
+section .content tbody tr td {
+	padding: 10px;
+	border-bottom: 2px solid #fff;
+}
+section .content thead tr {
+	background-color: #FFBEBE;
+	border-bottom: 2px solid #fff;
+}
+section .content thead tr th {
+	color: #fff;
+	padding: 10px;
+}
+section .content thead tr th:nth-of-type(1) { width: 60px; }
+section .content thead tr th:nth-of-type(2) { width: 580px; }
+section .content thead tr th:nth-of-type(3) { width: 120px; }
+section .content tbody tr td:nth-of-type(1) {
+	font-size: 14px;
+}
+section .content tbody tr td:nth-of-type(2) {
+	text-align: left;
+}
+section .content tbody tr td:nth-of-type(2) a{
+	color: #000000bb;
+	text-decoration: none;
+	font-weight: bold;
+}
+section .content tbody tr td:nth-of-type(2) a:hover{
+	cursor: pointer;
+	text-decoration: underline;
+}
+section .content tbody tr td:nth-of-type(3) {
+	font-size: 14px;
+}
+section .content .table-content {
+	text-align: left;
+	width: 565px;
+	margin-top: 10px;
+	padding: 5px;
+	border: 2px solid #D5C2EE80;
+	background-color: #ffffff;
+	float: right;
+	font-size: 14px; 
+	line-height: 22px;
+ 	font-family: '푸른전남체R', sans-serif;
+}
+
+/* paging */
+section .paging {
+	margin: 10px auto;
+	margin-bottom: 60px;
+	text-align: center;
+	font-family: '푸른전남체R', sans-serif;
+}
+section .paging .now-page {
+	color: #FFBEBE;
+	font-weight: bold;	
+}
+section .paging a {
+	color: #909090;
+	text-decoration: none;
+}
+section .paging a[href] {
+	color: #000;
+	text-decoration: none;
+}
+section .paging a[href]:hover {
+	text-decoration: underline;
+}

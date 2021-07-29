@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.koreait.shoefly.dao.ManagerDAO">
+
+
+	<!-- MEMBER -->
+	
+	<select id="countMember" resultType="int" parameterType="java.util.Map">
+		SELECT COUNT(*)
+		  FROM MEMBER
+		 WHERE MANAGER != 1
+		<if test="query != ''.toString and column != 'REGDATE'.toString">
+		   AND ${column} LIKE '%' || #{query} || '%'
+		</if>
+		<if test="column == 'REGDATE'.toString and startDate != ''.toString and endDate != ''.toString">
+		   AND REGDATE BETWEEN #{startDate} AND #{endDate}
+		</if>
+	</select>
+	
+	<select id="selectListMember" resultType="com.koreait.shoefly.dto.Member" parameterType="java.util.Map">
+		SELECT B.MEMBER_NO AS MEMBERNO, B.MEMBER_ID AS MEMBERID, B.PW, B.NAME, B.EMAIL, B.REGDATE, B.MANAGER, B.STATE
+		  FROM (
+				SELECT ROWNUM AS RN, A.MEMBER_NO, A.MEMBER_ID, A.PW, A.NAME, A.EMAIL, A.REGDATE, A.MANAGER, A.STATE
+				  FROM (
+						SELECT MEMBER_NO, MEMBER_ID, PW, NAME, EMAIL, REGDATE, MANAGER, STATE
+						  FROM MEMBER
+						 WHERE MANAGER != 1
+						<if test="query != ''.toString and column != 'REGDATE'.toString">
+						   AND ${column} LIKE '%' || #{query} || '%'
+						</if>
+						<if test="column == 'REGDATE'.toString and startDate != ''.toString and endDate != ''.toString">
+						   AND REGDATE BETWEEN #{startDate} AND #{endDate}
+						</if>
+						 ORDER BY ${order}
+						<if test="isDesc == 'true'.toString">
+						                   DESC
+						</if>
+					   ) A
+			   ) B
+		 WHERE B.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+
+	<select id="selectOneMember" resultType="com.koreait.shoefly.dto.Member">
+		SELECT MEMBER_NO AS MEMBERNO, MEMBER_ID AS MEMBERID, PW, NAME, EMAIL, REGDATE, MANAGER, STATE
+		  FROM MEMBER
+		 WHERE MEMBER_NO = #{_parameter}
+	</select>
+
+	<update id="deleteMember" parameterType="java.util.Map">
+		UPDATE MEMBER
+		   SET STATE = #{state}
+		 WHERE MEMBER_NO = #{memberNo}
+	</update>
+
+	<select id="selectListMemberAddress" resultType="com.koreait.shoefly.dto.MemberAddress">
+		SELECT MEMBER_ADDRESS_NO AS MEMBERADDRESSNO, MEMBER_NO AS MEMBERNO, NAME, ADDR1, ADDR2, STATE
+		  FROM MEMBER_ADDRESS
+		 WHERE MEMBER_NO = #{_parameter}
+		   AND STATE = 0
+	</select>
+	
+	<update id="updateMemberPw" parameterType="com.koreait.shoefly.dto.Member">
+		UPDATE MEMBER
+		   SET PW = #{pw}
+		 WHERE MEMBER_NO = #{memberNo}
+	</update>
+
+
+	<!-- PRODUCT -->
+	
+	<select id="countProduct" resultType="int" parameterType="java.util.Map">
+		SELECT COUNT(*)
+		  FROM PRODUCT
+	<where>
+		<if test="productNo != null">
+			   PRODUCT_NO LIKE '%' || #{productNo} || '%'
+		</if>
+		<if test="productName != null">
+		       PRODUCTNAME LIKE '%' || #{productName} || '%'
+		</if>
+		<if test="brands != null">
+		   AND BRAND IN
+			<foreach collection="brands" item="brand" open="(" close=")" separator=", "> 
+			            #{brand}
+			</foreach>
+		</if>
+	</where>
+	</select>
+
+	<select id="selectListProduct" resultType="com.koreait.shoefly.dto.Product" parameterType="java.util.Map">
+		SELECT B.PRODUCT_NO AS PRODUCTNO, B.PRODUCT_NAME AS PRODUCTNAME, B.BRAND, B.PRICE, B.IMAGE, B.STATE
+		  FROM (
+		        SELECT ROWNUM AS RN, A.PRODUCT_NO, A.PRODUCT_NAME, A.BRAND, A.PRICE, A.IMAGE, A.STATE
+		          FROM (
+		                SELECT PRODUCT_NO, PRODUCT_NAME, BRAND, PRICE, IMAGE, STATE
+		                  FROM PRODUCT
+	                <where>
+						<if test="productNo != null">
+							   PRODUCT_NO LIKE '%' || #{productNo} || '%'
+						</if>
+						<if test="productName != null">
+						   AND PRODUCT_NAME LIKE '%' || #{productName} || '%'
+						</if>
+						<if test="brands != null">
+						   AND BRAND IN
+							<foreach collection="brands" item="brand" open="(" close=")" separator=", "> 
+							            #{brand}
+							</foreach>
+						</if>
+					</where>
+	                     ORDER BY ${order} ${isDesc}
+	                   ) A
+	           ) B
+		 WHERE B.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+
+	<select id="selectOneProdcut" resultType="com.koreait.shoefly.dto.Product">
+		SELECT PRODUCT_NO AS PRODUCTNO, PRODUCT_NAME AS PRODUCTNAME, BRAND, PRICE, IMAGE, STATE
+		  FROM PRODUCT
+		 WHERE PRODUCT_NO = #{_parameter}
+	</select>
+	
+	<select id="selectListProductDetail" resultType="com.koreait.shoefly.dto.ProductDetail">
+		SELECT PRODUCT_DETAIL_NO AS PRODUCTDETAILNO, PRODUCT_NAME AS PRODUCTNAME, PRODUCT_SIZE AS PRODUCTSIZE
+		  FROM PRODUCT_DETAIL
+		 WHERE PRODUCT_NAME = #{_parameter}
+	</select>
+
+	<insert id="insertProduct" parameterType="com.koreait.shoefly.dto.Product">
+		INSERT INTO PRODUCT
+		VALUES (#{productNo}, #{productName}, #{brand}, #{price}, #{image}, #{state})
+	</insert>
+	
+	<insert id="insertProductDetail" parameterType="com.koreait.shoefly.dto.ProductDetail">
+		INSERT INTO PRODUCT_DETAIL
+		VALUES (PRODUCT_DETAIL_SEQ.NEXTVAL, #{productName}, #{productSize})
+	</insert>
+
+	<update id="updateProductState" parameterType="com.koreait.shoefly.dto.Product">
+		UPDATE PRODUCT
+		   SET STATE = #{state}
+		 WHERE PRODUCT_NO = #{productNo}
+	</update>
+	
+	<select id="countProductBuyForProduct" resultType="int">
+		SELECT COUNT(*)
+		  FROM PRODUCT_BUY
+		 WHERE PRODUCT_DETAIL_NO IN (SELECT PRODUCT_DETAIL_NO 
+		 							  FROM PRODUCT_DETAIL 
+		 							 WHERE PRODUCT_NAME = (SELECT PRODUCT_NAME
+									 						 FROM PRODUCT
+									 						WHERE PRODUCT_NO = #{_parameter}))
+	</select>
+
+	<select id="countProductSellForProduct" resultType="int">
+		SELECT COUNT(*)
+		  FROM PRODUCT_SELL
+		 WHERE PRODUCT_DETAIL_NO IN (SELECT PRODUCT_DETAIL_NO 
+		 							  FROM PRODUCT_DETAIL 
+		 							 WHERE PRODUCT_NAME = (SELECT PRODUCT_NAME
+									 						 FROM PRODUCT
+									 						WHERE PRODUCT_NO = #{_parameter}))
+	</select>
+	
+	<select id="countReviewForProduct" resultType="int">
+		SELECT COUNT(*)
+		  FROM REVIEW
+		 WHERE PRODUCT_NAME = (SELECT PRODUCT_NAME
+		 						 FROM PRODUCT
+		 						WHERE PRODUCT_NO = #{_parameter})
+	</select>
+	
+	<delete id="deleteProductDetails">
+		DELETE 
+		  FROM PRODUCT_DETAIL
+		 WHERE PRODUCT_NAME = (SELECT PRODUCT_NAME
+		 						 FROM PRODUCT
+		 						WHERE PRODUCT_NO = #{_parameter})
+	</delete>
+	
+	<delete id="deleteProduct">
+		DELETE
+		  FROM PRODUCT
+		 WHERE PRODUCT_NO = #{_parameter}
+	</delete>
+
+
+	<!-- PRODUCT BUY -->
+	
+	<select id="countProductBuy" resultType="int" parameterType="java.util.Map">
+		SELECT COUNT(*)
+		  FROM PRODUCT_BUY b INNER JOIN PRODUCT_DETAIL d
+		    ON b.PRODUCT_DETAIL_NO = d.PRODUCT_DETAIL_NO
+		 WHERE b.STATE = #{state}
+		<if test="memberId != null">
+		   AND UPPER(b.MEMBER_ID) LIKE UPPER(#{memberId})
+		</if>
+		<if test="productName != null">
+		   AND UPPER(d.PRODUCT_NAME) LIKE UPPER(#{productName})
+		</if>
+	</select>
+	
+	<select id="selectListProductBuy" resultType="com.koreait.shoefly.dto.ProductBuy" parameterType="java.util.Map">
+		SELECT r2.PRODUCT_BUY_NO AS PRODUCTBUYNO, r2.MEMBER_ID AS MEMBERID, r2.PRODUCT_DETAIL_NO AS PRODUCTDETAILNO, r2.PRODUCT_NAME AS PRODUCTNAME, r2.PRODUCT_SIZE AS PRODUCTSIZE, r2.PRICE, r2.MEMBER_ADDRESS_NO AS MEMBERADDRESSNO, r2.POSTDATE, r2.BUYDATE, r2.STATE
+		  FROM (
+				SELECT ROWNUM AS RN, r1.PRODUCT_BUY_NO, r1.MEMBER_ID, r1.PRODUCT_DETAIL_NO, r1.PRODUCT_NAME, r1.PRODUCT_SIZE, r1.PRICE, r1.MEMBER_ADDRESS_NO, r1.POSTDATE, r1.BUYDATE, r1.STATE
+				  FROM (
+						SELECT b.PRODUCT_BUY_NO, b.MEMBER_ID, d.PRODUCT_DETAIL_NO, d.PRODUCT_NAME, d.PRODUCT_SIZE, b.PRICE, b.MEMBER_ADDRESS_NO, b.POSTDATE, b.BUYDATE, b.STATE
+						  FROM PRODUCT_BUY b
+						 INNER JOIN PRODUCT_DETAIL d
+						    ON b.PRODUCT_DETAIL_NO = d.PRODUCT_DETAIL_NO
+						 WHERE b.STATE = #{state}
+						<if test="memberId != null">
+						   AND UPPER(b.MEMBER_ID) LIKE UPPER(#{memberId})
+						</if>
+						<if test="productName != null">
+						   AND UPPER(d.PRODUCT_NAME) LIKE UPPER(#{productName})
+						</if>
+						 ORDER BY ${order} ${isDesc}
+					  ) r1
+			  ) r2
+		WHERE r2.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+
+	<select id="selectOneMemberAddress" resultType="com.koreait.shoefly.dto.MemberAddress">
+		SELECT MEMBER_ADDRESS_NO AS MEMBERADDRESSNO, MEMBER_NO AS MEMBERNO, NAME, ADDR1, ADDR2, STATE
+		  FROM MEMBER_ADDRESS
+		 WHERE MEMBER_ADDRESS_NO = #{_parameter}	
+	</select>
+
+	<update id="updateProductBuyState" parameterType="com.koreait.shoefly.dto.ProductBuy">
+		UPDATE PRODUCT_BUY
+		   SET STATE = #{state}
+		 WHERE PRODUCT_BUY_NO = #{productBuyNo}
+	</update>
+	
+	<!-- PRODUCT SELL -->
+	<select id="countProductSell" resultType="int" parameterType="java.util.Map">
+		SELECT COUNT(*)
+		  FROM PRODUCT_SELL s INNER JOIN PRODUCT_DETAIL d
+		    ON s.PRODUCT_DETAIL_NO = d.PRODUCT_DETAIL_NO
+		 WHERE s.STATE = #{state}
+		<if test="memberId != null">
+		   AND UPPER(s.MEMBER_ID) LIKE UPPER(#{memberId})
+		</if>
+		<if test="productName != null">
+		   AND UPPER(d.PRODUCT_NAME) LIKE UPPER(#{productName})
+		</if>
+	</select>
+	
+	<select id="selectListProductSell" resultType="com.koreait.shoefly.dto.ProductSell" parameterType="java.util.Map">
+		SELECT r2.PRODUCT_SELL_NO AS PRODUCTSELLNO, r2.MEMBER_ID AS MEMBERID, r2.PRODUCT_DETAIL_NO AS PRODUCTDETAILNO, r2.PRODUCT_NAME AS PRODUCTNAME, r2.PRODUCT_SIZE AS PRODUCTSIZE, r2.PRICE, r2.MEMBER_ADDRESS_NO AS MEMBERADDRESSNO, r2.POSTDATE, r2.SELLDATE, r2.STATE
+		  FROM (
+				SELECT ROWNUM AS RN, r1.PRODUCT_SELL_NO, r1.MEMBER_ID, r1.PRODUCT_DETAIL_NO, r1.PRODUCT_NAME, r1.PRODUCT_SIZE, r1.PRICE, r1.MEMBER_ADDRESS_NO, r1.POSTDATE, r1.SELLDATE, r1.STATE
+				  FROM (
+						SELECT s.PRODUCT_SELL_NO, s.MEMBER_ID, d.PRODUCT_DETAIL_NO, d.PRODUCT_NAME, d.PRODUCT_SIZE, s.PRICE, s.MEMBER_ADDRESS_NO, s.POSTDATE, s.SELLDATE, s.STATE
+						  FROM PRODUCT_SELL s
+						 INNER JOIN PRODUCT_DETAIL d
+						    ON s.PRODUCT_DETAIL_NO = d.PRODUCT_DETAIL_NO
+						 WHERE s.STATE = #{state}
+						<if test="memberId != null">
+						   AND UPPER(s.MEMBER_ID) LIKE UPPER(#{memberId})
+						</if>
+						<if test="productName != null">
+						   AND UPPER(d.PRODUCT_NAME) LIKE UPPER(#{productName})
+						</if>
+						 ORDER BY ${order} ${isDesc}
+					  ) r1
+			  ) r2
+		WHERE r2.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+	
+	<update id="updateProductSellState" parameterType="com.koreait.shoefly.dto.ProductSell">
+		UPDATE PRODUCT_SELL
+		   SET STATE = #{state}
+		 WHERE PRODUCT_SELL_NO = #{productSellNo}
+	</update>
+	
+
+	<!-- NOTICE / FAQ -->
+
+	<select id="countNotice" resultType="int" parameterType="java.util.Map">
+		SELECT COUNT(*) 
+		  FROM NOTICE
+	   <if test="query != null">
+	   <choose>
+	   		<when test="column == 'ALL'.toString">
+		 WHERE TITLE LIKE '%' || #{query} || '%'
+            OR CONTENT LIKE '%' || #{query} || '%'
+            </when>
+            <when test="column == 'POSTDATE'.toString">
+		 WHERE POSTDATE BETWEEN #{startDate} AND #{endDate}
+            </when>
+            <otherwise>
+         WHERE ${column} LIKE '%' || #{query} || '%'
+            </otherwise>
+	   </choose>
+	   </if> 
+	</select>
+
+	<select id="selectListNotice" resultType="com.koreait.shoefly.dto.Notice" parameterType="java.util.Map">
+		SELECT B.NOTICE_NO AS NOTICENO, B.MEMBER_ID AS MEMBERID, B.TITLE, B.CONTENT, B.POSTDATE, B.STATE
+		  FROM (
+		        SELECT ROWNUM AS RN, A.NOTICE_NO, A.MEMBER_ID, A.TITLE, A.CONTENT, A.POSTDATE, A.STATE
+		          FROM (
+		                SELECT NOTICE_NO, MEMBER_ID, TITLE, CONTENT, POSTDATE, STATE
+		                  FROM NOTICE
+	                   <if test="query != null">
+	                   <choose>
+					   		<when test="column == 'ALL'.toString">
+						 WHERE TITLE LIKE '%' || #{query} || '%'
+				            OR CONTENT LIKE '%' || #{query} || '%'
+				            </when>
+				            <when test="column == 'POSTDATE'.toString">
+						 WHERE POSTDATE BETWEEN #{startDate} AND #{endDate}
+				            </when>
+				            <otherwise>
+				         WHERE ${column} LIKE '%' || #{query} || '%'
+				            </otherwise>
+					   </choose>
+	                   </if> 
+	                     ORDER BY POSTDATE DESC
+	                   ) A
+	           ) B
+		 WHERE B.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+
+	<select id="countFaq" resultType="int" parameterType="java.util.Map">
+		SELECT COUNT(*) 
+		  FROM FAQ
+	   <if test="query != null">
+       <choose>
+	   		<when test="column == 'ALL'.toString">
+		 WHERE QUESTION LIKE '%' || #{query} || '%'
+            OR ANSWER LIKE '%' || #{query} || '%'
+            </when>
+            <when test="column == 'POSTDATE'.toString">
+		 WHERE POSTDATE BETWEEN #{startDate} AND #{endDate}
+            </when>
+            <otherwise>
+         WHERE ${column} LIKE '%' || #{query} || '%'
+            </otherwise>
+	   </choose>
+       </if>
+	</select>
+
+	<select id="selectListFaq" resultType="com.koreait.shoefly.dto.Faq" parameterType="java.util.Map">
+		SELECT B.FAQ_NO AS FAQNO, B.MEMBER_ID AS MEMBERID, B.QUESTION, B.ANSWER, B.POSTDATE, B.STATE
+		  FROM (
+		        SELECT ROWNUM AS RN, A.FAQ_NO, A.MEMBER_ID, A.QUESTION, A.ANSWER, A.POSTDATE, A.STATE
+		          FROM (
+		                SELECT FAQ_NO, MEMBER_ID, QUESTION, ANSWER, POSTDATE, STATE
+		                  FROM FAQ
+		                  <if test="query != null">
+					      <choose>
+					   		<when test="column == 'ALL'.toString">
+						 WHERE QUESTION LIKE '%' || #{query} || '%'
+					           OR ANSWER LIKE '%' || #{query} || '%'
+					           </when>
+					           <when test="column == 'POSTDATE'.toString">
+						 WHERE POSTDATE BETWEEN #{startDate} AND #{endDate}
+					           </when>
+					           <otherwise>
+					     WHERE ${column} LIKE '%' || #{query} || '%'
+					           </otherwise>
+					   	  </choose>
+					      </if>
+	                     ORDER BY POSTDATE DESC
+	                   ) A
+	           ) B
+		 WHERE RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+
+	<select id="selectOneNotice" resultType="com.koreait.shoefly.dto.Notice">
+		SELECT NOTICE_NO AS NOTICENO, MEMBER_ID AS MEMBERID, TITLE, CONTENT, POSTDATE, STATE
+          FROM NOTICE
+         WHERE NOTICE_NO = #{_parameter}
+	</select>
+	
+	<select id="selectOneFaq" resultType="com.koreait.shoefly.dto.Faq">
+		SELECT FAQ_NO AS FAQNO, MEMBER_ID AS MEMBERID, QUESTION, ANSWER, POSTDATE, STATE
+		  FROM FAQ
+		 WHERE FAQ_NO = #{_parameter}
+	</select>
+	
+	<insert id="insertNotice" parameterType="com.koreait.shoefly.dto.Notice">
+		INSERT INTO NOTICE
+		VALUES (NOTICE_SEQ.NEXTVAL, #{memberId}, #{title}, #{content}, SYSDATE, 0) 
+	</insert>
+	
+	<update id="updateNotice" parameterType="com.koreait.shoefly.dto.Notice">
+		UPDATE NOTICE
+		   SET TITLE = #{title}
+		     , CONTENT = #{content}
+		 WHERE NOTICE_NO = #{noticeNo}
+	</update>
+	
+	<delete id="deleteNotice">
+		DELETE 
+		  FROM NOTICE
+		 WHERE NOTICE_NO = #{_parameter}
+	</delete>
+	
+	<insert id="insertFaq" parameterType="com.koreait.shoefly.dto.Faq">
+		INSERT INTO FAQ
+		VALUES (FAQ_SEQ.NEXTVAL, #{memberId}, #{question}, #{answer}, SYSDATE, 0) 
+	</insert>
+	
+	<update id="updateFaq" parameterType="com.koreait.shoefly.dto.Faq">
+		UPDATE FAQ
+		   SET QUESTION = #{question}
+		     , ANSWER = #{answer}
+		 WHERE FAQ_NO = #{faqNo}
+	</update>
+	
+	<delete id="deleteFaq">
+		DELETE 
+		  FROM FAQ
+		 WHERE FAQ_NO = #{_parameter}
+	</delete>
+	
+	
+	<!-- REVIEW -->
+	<select id="countReview" resultType="int">
+		SELECT COUNT(*)
+		  FROM REVIEW
+		<if test="column != null and column != ''.toString">
+			<choose>
+				<when test="column eq 'ALL'.toString">
+		 WHERE UPPER(TITLE) LIKE UPPER(#{query})
+		    OR UPPER(CONTENT) LIKE UPPER(#{query})
+				</when>
+				<when test="column eq 'POSTDATE'.toString">
+		 WHERE POSTDATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+				</when>
+				<otherwise>
+		 WHERE UPPER(${column}) LIKE UPPER(#{query})
+				</otherwise>
+			</choose>
+		</if>
+	</select>
+	
+	<select id="selectListReview" resultType="com.koreait.shoefly.dto.Review">
+		SELECT B.REVIEW_NO AS REVIEWNO, B.MEMBER_ID AS MEMBERID, B.TITLE,
+		       B.PRODUCT_NAME AS PRODUCTNAME, B.HIT, B.POSTDATE, B.STATE
+		  FROM (SELECT ROWNUM AS RN, A.REVIEW_NO, A.MEMBER_ID,
+		               A.TITLE, A.PRODUCT_NAME, A.HIT, A.POSTDATE, A.STATE
+		          FROM (SELECT REVIEW_NO,
+		                       MEMBER_ID,
+		                       TITLE,
+		                       PRODUCT_NAME,
+		                       HIT,
+		                       POSTDATE,
+		                       STATE
+		                  FROM REVIEW
+		<if test="column != null and column != ''.toString">
+			<choose>
+				<when test="column eq 'ALL'.toString">
+						 WHERE UPPER(TITLE) LIKE UPPER(#{query})
+							OR UPPER(CONTENT) LIKE UPPER(#{query})
+				</when>
+				<when test="column eq 'POSTDATE'.toString">
+						 WHERE POSTDATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+				</when>
+				<otherwise>
+						 WHERE UPPER(${column}) LIKE UPPER(#{query})
+				</otherwise>
+			</choose>
+		</if>
+		                 ORDER BY REVIEW_NO DESC) A) B
+		 WHERE B.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+	
+	<update id="deleteReview">
+		UPDATE REVIEW
+		   SET STATE = -1
+		 WHERE REVIEW_NO = #{reviewNo}
+	</update>
+
+	<update id="restoreReview">
+		UPDATE REVIEW
+		   SET STATE = 0
+		 WHERE REVIEW_NO = #{reviewNo}
+	</update>
+</mapper>

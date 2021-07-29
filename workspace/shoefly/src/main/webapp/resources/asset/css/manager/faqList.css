@@ -1,0 +1,120 @@
+@charset "UTF-8";
+
+/* section */
+section {
+	margin-top: 30px;
+}
+
+section input, select, button {
+	background: none;
+	border: none;
+	outline: none;
+}
+
+/* title */
+section h2 {
+	border-bottom: 1px solid #adbac790;
+	padding: 10px 0;
+	padding-left: 30px;
+}
+section h2 a {
+	color: #539bf5;
+	font-size: 22px;
+	text-decoration: none;
+}
+
+/* search */
+section .search {
+	display: inline-block;
+}
+section form {
+	display: inline-block;
+	border-bottom: 1px solid #adbac790;
+	padding: 5px;
+	box-sizing: border-box;
+	height: 30px;
+}
+section form input[type="date"] {
+	font-size: 13px;
+	width: 128px;
+}
+
+/* div.write */
+section div.write {
+	display: inline-block;
+	border-bottom: 1px solid #adbac790;
+	margin-left: 30px;
+	padding: 5px;
+	box-sizing: border-box;
+	height: 30px;
+}
+section div.write:hover {
+	border-bottom: 3px solid #adbac790;
+}
+section div.write:hover input {
+	cursor: pointer;
+	color: #adbac790; 
+}
+
+/* table */
+section table {
+	margin: 10px;
+	border: 1px solid #adbac760;
+	border-radius: 5px;
+	border-collapse: collapse;
+	text-align: center;
+}
+section table th {
+	font-weight: normal;
+	color: #d6dce2;
+}
+section table tr {
+	border-bottom: 1px solid #adbac760;
+}
+section table th, section table td {
+	padding: 10px;
+	margin: 0;
+}
+section table tr:hover td {
+	background-color: #323943;
+}
+section table tr td:nth-of-type(1) div {
+ 	min-width: 38px; 
+ 	max-width: 38px; 
+}
+section table tr td:nth-of-type(2) div {
+ 	min-width: 480px; 
+ 	max-width: 590px; 
+	overflow: hidden; 
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-align: left;
+}
+section table tr td:nth-of-type(3) {
+ 	min-width: 90px; 
+ 	max-width: 90px; 
+}
+section table tr td input[type="button"] {
+	width: 50px;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: bold;
+}
+section table tr td input[type="button"]:hover {
+	color: #8296aa;
+}
+
+/* paging */
+section div.paging {
+	text-align: center;
+}
+section div.paging a {
+	text-decoration: none;
+	color: #adbac780;
+}
+section div.paging a.now-page {
+	color: #539bf5;
+}	
+section div.paging a[href] {
+	color: #adbac7;
+}

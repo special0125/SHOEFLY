@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.koreait.shoefly.dao.NoticeDAO">
+
+	<select id="countNotice" resultType="int" parameterType="java.util.Map">
+		SELECT COUNT(*) 
+		  FROM NOTICE
+	   <where>
+	   <if test="query != null">
+		       TITLE LIKE '%' || #{query} || '%'
+            OR CONTENT LIKE '%' || #{query} || '%'
+	   </if> 
+	   </where>
+	</select>
+
+	<select id="selectListNotice" resultType="com.koreait.shoefly.dto.Notice" parameterType="java.util.Map">
+		SELECT B.NOTICE_NO AS NOTICENO, B.MEMBER_ID AS MEMBERID, B.TITLE, B.CONTENT, B.POSTDATE, B.STATE
+		  FROM (
+		        SELECT ROWNUM AS RN, A.NOTICE_NO, A.MEMBER_ID, A.TITLE, A.CONTENT, A.POSTDATE, A.STATE
+		          FROM (
+		                SELECT NOTICE_NO, MEMBER_ID, TITLE, CONTENT, POSTDATE, STATE
+		                  FROM NOTICE
+	                   <where>
+	                   <if test="query != null">
+		                       TITLE LIKE '%' || #{query} || '%'
+		                    OR CONTENT LIKE '%' || #{query} || '%'
+	                   </if> 
+	                   </where>
+	                     ORDER BY POSTDATE DESC
+	                   ) A
+	           ) B
+		 WHERE B.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+
+	<select id="countFaq" resultType="int" parameterType="java.util.Map">
+		SELECT COUNT(*) 
+		  FROM FAQ
+	   <where>
+	   <if test="query != null">
+		   	   QUESTION LIKE '%' || #{query} || '%'
+            OR ANSWER LIKE '%' || #{query} || '%'
+	   </if> 
+	   </where>
+	</select>
+
+	<select id="selectListFaq" resultType="com.koreait.shoefly.dto.Faq" parameterType="java.util.Map">
+		SELECT B.FAQ_NO AS FAQNO, B.MEMBER_ID AS MEMBERID, B.QUESTION, B.ANSWER, B.POSTDATE, B.STATE
+		  FROM (
+		        SELECT ROWNUM AS RN, A.FAQ_NO, A.MEMBER_ID, A.QUESTION, A.ANSWER, A.POSTDATE, A.STATE
+		          FROM (
+		                SELECT FAQ_NO, MEMBER_ID, QUESTION, ANSWER, POSTDATE, STATE
+		                  FROM FAQ
+	                   <where>
+	                   <if test="query != null">
+		                       QUESTION LIKE '%' || #{query} || '%'
+		                    OR ANSWER LIKE '%' || #{query} || '%'
+	                   </if> 
+	                   </where>
+	                     ORDER BY POSTDATE DESC
+	                   ) A
+	           ) B
+		 WHERE RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+
+</mapper>

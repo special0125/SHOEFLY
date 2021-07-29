@@ -1,0 +1,54 @@
+--- dto 패키지
+
+lombok @Data에는 @ToString이 포함되어 있습니다.
+
+내용은 일반적으로 context라 하지 않고, content라고 합니다.
+(수정하는 것이 좋은데 손이 많이 가면 그냥 사용해도 무방합니다.)
+
+
+--- util 패키지
+
+javadoc으로 주석 남기는 것 좋았습니다.
+
+SecurityUtils
+getIp() 메소드는 if() 의 나열이므로 ip가 null인 경우 언제가 마지막 if의 실행결과만 살아남게 되어 있으므로
+if - else if 조합으로 변경해 주세요.
+
+
+--- dao 패키지
+
+manager.xml ${calumn} -> ${column}
+calumn이 많이 사용되었는데 올바른 단어 column으로 수정하는 것이 좋습니다.
+
+참고로 자바 단에서
+String query = "%" + query + "%";로 만들고,
+쿼리문에서
+${column} LIKE #{query} 로 처리하는 것이 표준 SQL의 처리에 가까운 방법입니다. (|| 연산자는 오라클에서만 지원되므로)
+
+문제)
+<select id="selectListNotice">에서 회원의 id대신 회원의 이름을 가져오고자 한다면 어떤 방법을 사용할 것인지 고민해 보세요.
+
+날짜를 처리할 때
+POSTDATE BETWEEN #{startDate} AND #{endDate} 보다는
+POSTDATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')로 처리하는 것이 좋습니다.
+
+member.xml
+이메일을 변경할 수 있는 쿼리가 없습니다.
+
+
+--- config 패키지
+
+@Bean이 다 어디 있죠? 
+
+
+--- command 패키지
+
+가능하다면 첨부 파일의 이름 중복 방지를 위한 UUID 처리 방법으로 첨부 방식을 바꿔 보는 것이 좋을 듯 합니다.
+
+String으로 변환하기 위해서 (String)searchMap.get("column") 보다는
+String.valueOf(searchMap.get("column")) 또는 searchMap.get("column").toString() 을 많이 사용합니다.
+
+
+--- webapp/resources/asset/jsp
+
+jsp는 동적 페이지 작성용이기 때문에 정적 요소를 보관하는 resources에 보관하는 것이 적절하지 않습니다. views로 옮겨주세요.

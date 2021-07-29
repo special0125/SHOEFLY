@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.koreait.shoefly.dao.ReviewDAO">
+
+	<select id="countReview" resultType="int" parameterType="java.util.Map">
+		SELECT COUNT(*) 
+		  FROM REVIEW
+		 WHERE STATE = 0
+	   <if test="column != null and query != null">
+	   		AND UPPER(${column}) LIKE '%' || UPPER(#{query}) || '%'
+	   </if>
+	</select>
+	
+	
+	<select id="selectListReview" resultType="com.koreait.shoefly.dto.Review" parameterType="java.util.Map">
+		SELECT B.REVIEW_NO AS REVIEWNO, B.MEMBER_ID AS MEMBERID, B.TITLE,
+		       B.PRODUCT_NAME AS PRODUCTNAME, B.HIT, B.POSTDATE, B.STATE
+		  FROM (SELECT ROWNUM AS RN, A.REVIEW_NO, A.MEMBER_ID,
+		               A.TITLE, A.PRODUCT_NAME, A.HIT, A.POSTDATE, A.STATE
+		          FROM (SELECT REVIEW_NO,
+		                       MEMBER_ID,
+		                       TITLE,
+		                       PRODUCT_NAME,
+		                       HIT,
+		                       POSTDATE,
+		                       STATE
+		                  FROM REVIEW
+		                 WHERE STATE = 0
+		          	<if test="column != null and query != null">
+		          		AND UPPER(${column}) LIKE '%' || UPPER(#{query}) || '%'
+		          	</if>
+		                 ORDER BY REVIEW_NO DESC) A) B
+		 WHERE B.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+	
+	<select id="selectProduct" resultType="com.koreait.shoefly.dto.Review">
+		SELECT PRODUCT_NAME AS PRODUCTNAME
+		  FROM PRODUCT
+		 ORDER BY PRODUCT_NAME
+	</select>
+	
+	<insert id="insertReview">
+		INSERT
+  		INTO REVIEW
+		VALUES (REVIEW_SEQ.NEXTVAL, #{param1}, #{param2}, #{param3}, #{param4}, #{param5}, SYSDATE, SYSDATE, 0, '127.0.0.1', 0)
+	</insert>
+	
+	<select id="selectReview" resultType="com.koreait.shoefly.dto.Review">
+		SELECT REVIEW_NO AS REVIEWNO, MEMBER_ID AS MEMBERID, PRODUCT_NAME AS PRODUCTNAME, TITLE, CONTENT, IMAGE, POSTDATE, MODIFYDATE, HIT, IP, STATE
+		  FROM REVIEW
+		 WHERE REVIEW_NO = #{reviewNo} 
+	</select>
+
+	<update id="updateReview">
+		UPDATE REVIEW
+		   SET TITLE = #{param1}, 
+		       CONTENT = #{param2},
+		       PRODUCT_NAME = #{param3},
+		       IMAGE = #{param4},
+		       MODIFYDATE = SYSDATE
+		 WHERE REVIEW_NO = #{param5}
+	</update>
+
+	<update id="deleteReview">
+		UPDATE REVIEW
+		   SET STATE = 1
+		 WHERE REVIEW_NO = #{reviewNo}
+	</update>
+	
+	<update id="updateHit">
+		UPDATE REVIEW
+		   SET HIT = HIT + 1
+		 WHERE REVIEW_NO = #{reviewNo}
+	</update>
+
+
+
+
+	<!-- ================리뷰 댓글=================== -->
+	
+	<select id="countReviewComment" resultType="int" parameterType="int">
+		SELECT COUNT(*) 
+		  FROM REVIEW_COMMENT
+		 WHERE REVIEW_NO = #{_parameter}
+		   AND STATE = 0
+	</select>
+	
+	<select id="selectCommentList" resultType="com.koreait.shoefly.dto.ReviewComment" parameterType="java.util.Map">
+		SELECT B.REVIEW_COMMENT_NO AS REVIEWCOMMENTNO, B.REVIEW_NO AS REVIEWNO,
+			   B.MEMBER_ID AS MEMBERID, B.CONTEXT, B.STATE
+		  FROM (SELECT ROWNUM AS RN, A.REVIEW_COMMENT_NO, A.REVIEW_NO,
+					   A.MEMBER_ID, A.CONTEXT, A.STATE
+		  		  FROM (SELECT REVIEW_COMMENT_NO,
+		   			   	       REVIEW_NO,
+		               		   MEMBER_ID,
+		               		   CONTEXT,
+		              		   STATE
+		           		  FROM REVIEW_COMMENT
+		           		 WHERE REVIEW_NO = #{reviewNo}
+		           		 AND STATE = 0
+		                 ORDER BY REVIEW_COMMENT_NO) A) B
+		WHERE B.RN BETWEEN #{beginRecord} AND #{endRecord}
+	</select>
+	
+	<insert id="insertComment">
+		INSERT 
+		  INTO REVIEW_COMMENT
+		VALUES (REVIEW_COMMENT_SEQ.NEXTVAL, #{reviewNo}, #{memberId}, #{context}, 0)
+	</insert>
+
+	<update id="updateComment">
+		UPDATE REVIEW_COMMENT
+		   SET CONTEXT = #{context}
+		 WHERE REVIEW_COMMENT_NO = #{reviewCommentNo}
+	</update>
+	
+	<update id="deleteComment">
+		UPDATE REVIEW_COMMENT
+		   SET STATE = 1
+		 WHERE REVIEW_COMMENT_NO = #{reviewCommentNo}
+	</update>
+
+
+
+
+
+</mapper>

@@ -1,0 +1,65 @@
+@charset "UTF-8";
+
+/* section */
+section {
+	margin-top: 30px;
+	display: flex;
+}
+
+section input, section select, section button {
+	background: none;
+	border: none;
+	outline: none;
+}
+	
+/* .left-container */
+section .left-container img {
+	width: 280px;
+	height: 280px;
+	padding: 10px;
+	border: 1px solid #adbac790;
+	box-sizing: border-box;
+}
+
+/* .right-container */
+section .right-container {
+	width: 580px;
+	height: 280px;
+	border: 1px solid #adbac790;
+	box-sizing: border-box;
+	margin-left: 10px;
+}
+
+/* .right-container h3 */
+section .right-container h3 {
+	margin: 0;
+	margin-top: 10px;
+	padding: 5px 10px;
+	border-bottom: 1px solid #adbac790;
+}
+
+/* .right-container li */
+section .right-container li {
+	padding: 10px;
+	border-bottom: 1px solid #adbac790;
+}
+section .right-container li:last-of-type {
+	border-bottom: none;	
+}
+section .right-container li span:first-of-type {
+	display: inline-block;
+	width: 65px;
+}
+section .right-container li input[type="text"] {
+	width: 420px;
+}
+section .right-container li input[type="button"] {
+	cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+}
+section .right-container li input[type="button"]:hover {
+	color: #68a8f7;
+	text-decoration: underline;
+}

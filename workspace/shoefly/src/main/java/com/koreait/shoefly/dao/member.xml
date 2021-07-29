@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.koreait.shoefly.dao.MemberDAO">
+	
+	<!-- 로그인 -->
+	<select id="login" resultType="com.koreait.shoefly.dto.Member">
+		SELECT MEMBER_NO AS MEMBERNO, MEMBER_ID AS MEMBERID, PW, NAME, EMAIL, REGDATE, MANAGER, STATE
+		  FROM MEMBER
+		 WHERE MEMBER_ID = #{memberId} 
+		   AND PW = #{pw}  
+		   AND STATE = 0
+	</select>
+	
+	<!-- 아이디 체크 -->
+	<select id="idCheck" resultType="int">
+		SELECT COUNT(MEMBER_ID)
+		  FROM MEMBER
+		 WHERE MEMBER_ID = #{memberId}  
+	</select>
+
+	<!-- 이메일 중복 -->
+	<select id="emailOrCheck" resultType="int">
+		SELECT COUNT(*)
+		  FROM MEMBER
+		 WHERE EMAIL = #{email} 
+	</select>
+
+	<!-- 회원가입 -->
+	<insert id="join">
+		INSERT INTO MEMBER
+		VALUES (MEMBER_SEQ.NEXTVAL, #{memberId}, #{pw}, #{name}, #{email}, SYSDATE, 0, 0)
+	</insert>
+
+	<!-- 아이디 찾기 -->
+	<select id="findId" resultType="com.koreait.shoefly.dto.Member">
+		SELECT MEMBER_ID AS MEMBERID, REGDATE
+		  FROM MEMBER
+		 WHERE EMAIL = #{email}
+	</select>
+
+	<!-- 아이디 존재여부 -->
+	<select id="idExists" resultType="String">
+		SELECT EMAIL
+		  FROM MEMBER
+		 WHERE MEMBER_ID = #{memberId} 
+		   AND STATE = 0
+	</select>
+
+	<!-- 비밀번호 찾기 -->
+	<select id="findPw" resultType="com.koreait.shoefly.dto.Member">
+		SELECT MEMBER_NO AS MEMBERNO, MEMBER_ID AS MEMBERID, PW, EMAIL, REGDATE
+		  FROM MEMBER
+		 WHERE MEMBER_ID = #{memberId}
+		   AND EMAIL = #{email}
+	</select>
+	
+	<!-- 비밀번호 변경 -->
+	<update id="updatePw">
+		UPDATE MEMBER
+		   SET PW = #{pw}
+		 WHERE MEMBER_NO = #{memberNo}  
+	</update>
+	
+	<!-- 회원탈퇴(state : -1) -->
+	<update id="deleteMember">
+		UPDATE MEMBER
+		   SET STATE = -1
+		 WHERE MEMBER_NO = #{memberNo}  
+	</update>
+	
+	<!-- 이름변경 -->
+	<update id="updateName">
+		UPDATE MEMBER
+		   SET NAME = #{name}
+		 WHERE MEMBER_NO = #{memberNo}   
+	</update>
+	
+	<!-- 주소목록 가져오기 -->
+	<select id="selectAddrList" resultType="com.koreait.shoefly.dto.MemberAddress">
+		SELECT MEMBER_ADDRESS_NO AS MEMBERADDRESSNO, MEMBER_NO AS MEMBERNO, NAME, ADDR1, ADDR2, STATE
+		  FROM MEMBER_ADDRESS
+		 WHERE MEMBER_NO = #{memberNo}
+		   AND STATE = 0
+	</select>
+	
+	<!-- 수정할 주소정보 가져오기 -->
+	<select id="selectAddrByNo" resultType="com.koreait.shoefly.dto.MemberAddress">
+		SELECT MEMBER_ADDRESS_NO AS MEMBERADDRESSNO, MEMBER_NO AS MEMBERNO, NAME, ADDR1, ADDR2, STATE
+		  FROM MEMBER_ADDRESS
+		 WHERE MEMBER_ADDRESS_NO = #{memberAddressNo}
+	</select>
+	
+	<!--  주소 수정 -->
+	<update id="updateAddress">
+		UPDATE MEMBER_ADDRESS
+		   SET NAME = #{name}
+		     , ADDR1 = #{addr1}
+		     , ADDR2 = #{addr2}
+		 WHERE MEMBER_NO = #{memberNo}
+		   AND MEMBER_ADDRESS_NO = #{memberAddressNo} 
+	</update>
+	
+	<!-- 주소 삭제(state : -1) -->
+	<update id="deleteMemberAddress">
+		UPDATE MEMBER_ADDRESS
+		   SET STATE = -1
+		 WHERE MEMBER_NO = #{memberNo}
+		   AND MEMBER_ADDRESS_NO = #{memberAddressNo}  
+	</update>
+	
+	<!-- 주소 추가 -->
+	<insert id="insertAddress">
+		INSERT INTO MEMBER_ADDRESS
+		VALUES (MEMBER_ADDRESS_SEQ.NEXTVAL, #{memberNo}, #{name}, #{addr1}, #{addr2}, 0)
+	</insert>
+	
+	<!-- 페이징 -->
+	<select id="countBuy" resultType="int">
+		SELECT COUNT(*)
+		  FROM PRODUCT_BUY
+	</select>
+	
+	<!-- 구매내역 리스트 -->
+	<select id="selectListBuy" resultType="com.koreait.shoefly.dto.ProductBuy">
+		SELECT b.PRODUCT_BUY_NO AS PRODUCTBUYNO
+			 , b.MEMBER_ID AS MEMBERID
+			 , d.PRODUCT_DETAIL_NO AS PRODUCTDETAILNO
+			 , d.PRODUCT_NAME AS PRODUCTNAME
+			 , d.PRODUCT_SIZE AS PRODUCTSIZE
+			 , b.PRICE
+			 , b.MEMBER_ADDRESS_NO AS MEMBERADDRESSNO
+			 , p.PRODUCT_NO AS PRODUCTNO
+			 , p.IMAGE
+			 , b.POSTDATE
+			 , b.BUYDATE
+			 , b.STATE
+      FROM PRODUCT_BUY b 
+     INNER JOIN PRODUCT_DETAIL d 
+        ON b.PRODUCT_DETAIL_NO = d.PRODUCT_DETAIL_NO
+     INNER JOIN PRODUCT p
+        ON d.PRODUCT_NAME = p.PRODUCT_NAME
+     WHERE b.STATE = #{param1}
+       AND b.MEMBER_ID = #{param2}
+	</select>
+
+	<!-- 마이페이지에서 구매대기 신청 삭제 -->
+	<update id="deleteBuyRequest">
+		UPDATE PRODUCT_BUY
+		   SET STATE = -1
+		 WHERE PRODUCT_BUY_NO = #{param1}
+	</update>
+	
+	<!-- 판매내역 리스트 -->
+	<select id="selectListSell" resultType="com.koreait.shoefly.dto.ProductSell">
+		SELECT s.PRODUCT_SELL_NO AS PRODUCTSELLNO
+			 , s.MEMBER_ID AS MEMBERID
+			 , d.PRODUCT_DETAIL_NO AS PRODUCTDETAILNO
+			 , d.PRODUCT_NAME AS PRODUCTNAME
+			 , d.PRODUCT_SIZE AS PRODUCTSIZE
+			 , s.PRICE
+			 , s.MEMBER_ADDRESS_NO AS MEMBERADDRESSNO
+			 , p.PRODUCT_NO AS PRODUCTNO
+			 , p.IMAGE
+			 , s.POSTDATE
+			 , s.SELLDATE
+			 , s.STATE
+      FROM PRODUCT_SELL s 
+     INNER JOIN PRODUCT_DETAIL d 
+        ON s.PRODUCT_DETAIL_NO = d.PRODUCT_DETAIL_NO
+     INNER JOIN PRODUCT p
+        ON d.PRODUCT_NAME = p.PRODUCT_NAME
+     WHERE s.STATE = #{param1}
+       AND s.MEMBER_ID = #{param2}
+	</select>
+	
+	<!-- 마이페이지에서 판매대기 신청 삭제 -->
+	<update id="deleteSellRequest">
+		UPDATE PRODUCT_SELL
+		   SET STATE = -1
+		 WHERE PRODUCT_SELL_NO = #{param1}
+	</update>
+</mapper>

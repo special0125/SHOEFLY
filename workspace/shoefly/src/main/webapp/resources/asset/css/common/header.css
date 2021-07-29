@@ -1,0 +1,80 @@
+@charset "UTF-8";
+
+/* 모든 파일 */
+@font-face {
+	font-family: '푸른전남체R';
+	src: url("../../font/PureunJeonnam.ttf");
+}
+@font-face {
+	font-family: '푸른전남체M';
+	src: url("../../font/PureunJeonnam-Medium.ttf")
+}
+* {
+	font-family: '푸른전남체M', sans-serif;
+}
+body {
+	padding: 0;
+	margin: 0;
+}
+input[type="text"], textarea, pre {
+	font-family: '푸른전남체R', sans-serif;
+}
+input[type="password"] {
+	font-family: sans-serif;
+}
+/* header */
+section {
+	min-height: 750px;
+}
+header {
+	position: relative;
+	width: 1080px;
+	height: 160px;
+	margin: 0 auto;
+}
+header a {
+	color: #000;
+	cursor: pointer;
+	text-decoration: none;
+}
+header img{
+	width: 100%;
+}
+header .logo_container {
+	position: absolute;
+	left: 20px;
+	top: 20px;
+	width: 230px;
+	height: 80px;
+	box-sizing: border-box;
+}
+
+header .login_container {
+	position: absolute;
+	bottom: 44px;
+	width: 100%;
+	text-align: right;
+}
+header .login_container span, header .login_container a {
+	display: inline-block;
+	padding: 0 10px;
+	border-left: 1px solid #000;
+	font-size: 14px;
+}
+header .login_container a:first-of-type {
+	border-left: none;
+}
+header .nav_container {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	background: linear-gradient(to right, #D5C2EE, #FFBEBE);
+	text-align: right;
+}
+header .nav_container a {
+	display: inline-block;
+	color: #fff;
+	font-weight: bold;
+	padding: 10px 20px;
+	margin: 0 8px;
+}

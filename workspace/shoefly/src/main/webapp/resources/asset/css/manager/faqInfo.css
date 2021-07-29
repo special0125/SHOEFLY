@@ -1,0 +1,87 @@
+@charset "UTF-8";
+/* form */
+form {
+	background-color: #fff;
+	margin: 10px;
+}
+form input, form button, form textarea {
+	border: none;
+	outline: none;
+	background: none;
+	color: #212345;
+}
+
+/* form h3 */
+form h3 {
+	margin: 0;
+	padding: 10px 20px;
+	border-bottom: 2px solid #22272e;
+	color: #FFBEBE;
+}
+
+/* .title #title */
+form .title {
+	margin: 0;
+	padding: 10px 20px;
+	border-bottom: 2px solid #22272e;
+}
+form #question {
+	width: 620px;
+}
+/* .content #content */
+form .content {
+	margin: 0;
+	padding: 10px 20px;
+	border-bottom: 2px solid #22272e;
+}
+form #answer {
+	width: 630px;
+	min-height: 380px;
+	padding: 10px;
+	border: 1px solid #22272e80;
+	resize: vertical; 
+}
+
+/* .preview #preview */
+form .preview {
+	margin: 0;
+	padding: 10px 20px;
+	border-bottom: 2px solid #22272e;
+}
+form #preview {
+	text-align: left;
+    width: 565px;
+    margin-left: 20px;
+    margin-top: 10px;
+    padding: 5px;
+    border: 2px solid #D5C2EE80;
+    background-color: #ffffff;
+    font-size: 14px;
+    line-height: 22px;
+    font-family: '푸른전남체R', sans-serif;
+	color: #212345;
+}
+form #preview * {
+	color: #212345;
+}
+
+/* .button_area */
+.button_area {
+	background-color: #22272e;
+	padding: 5px 10px;
+}
+.button_area input {
+	color: #539bf5;
+}
+.button_area input:hover {
+	color: #539bf590;
+}
+.button_area input[value="삭제하기"] {
+	color: #ff0000;
+}
+.button_area input[value="삭제하기"]:hover {
+	color: #ff000090;
+}
+
+
+

@@ -1,0 +1,76 @@
+@charset "UTF-8";
+
+*{
+	box-sizing: border-box;
+}
+.reviewList_container {
+	width: 1080px;
+	margin: 0 auto;
+}
+
+.search_box {
+	float: left;
+	width: 100%;
+	height: 30px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+.selectBox {
+	width: 70px;
+	height: 30px;
+}
+.selectBox:: -ms-expand {
+	display: none;
+}
+.queryBox {
+	width: 200px;
+	height: 30px;
+}
+.button {
+	width: 70px;
+	height: 30px;
+	border-radius: 3px;
+}
+#search_btn {
+	border: 1px solid #D5C2EE;
+	background-color: #D5C2EE;
+}
+#insertReview_btn {
+	float: right;
+	width: 100px;
+	border: 1px solid #FFBEBE;
+	background-color: #FFBEBE;
+}
+.reviewList_table {
+	width: 100%;
+	margin: 0 auto;
+	text-align: center;
+	border-collapse: collapse;
+}
+.thead {
+	background: #D5C2EE90;
+	font-weight: bold;
+}
+th, td {
+	border-bottom: 2px solid #FFFFFF;
+	height: 55px;
+}
+td {
+	background-color: #FFF0F5;
+}
+a {
+	text-decoration: none;
+	color: black;
+}
+a:hover {
+	text-decoration: underline;
+}
+.button:hover {
+	cursor: pointer;
+}
+.paging {
+	margin: auto;
+	height: 50px;
+	line-height: 50px;
+	text-align: center;
+}

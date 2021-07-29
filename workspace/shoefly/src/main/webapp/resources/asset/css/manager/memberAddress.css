@@ -1,0 +1,42 @@
+@charset "UTF-8";
+
+h3 {
+	margin: 0 auto;
+	padding: 10px 10px;
+	border-bottom: 1px solid #adbac790; 
+	color: #539bf5;
+}
+select, input, button {
+	background: none;
+	border: none;
+}
+
+.search_div {
+	padding: 10px;
+	margin-left: 30px;
+}
+
+.addr_div {
+	margin: 0 auto;
+	width: 400px;
+	border: 1px solid #adbac790;
+}
+.addr_div span {
+	display: inline-block;
+	width: 90px;
+	padding: 10px;
+	font-weight: bold;
+}
+
+.bottom_div {
+	padding: 10px;
+	text-align: right;
+	margin: 0 30px;
+}
+.bottom_div input {
+	color: #539bf5;
+	font-weight: bold;
+}
+.bottom_div input:hover {
+	color: #539bf560;
+}

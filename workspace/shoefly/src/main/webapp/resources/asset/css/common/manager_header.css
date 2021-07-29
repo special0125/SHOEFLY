@@ -1,0 +1,110 @@
+@charset "UTF-8";
+
+/* 모든 파일 */
+@font-face {
+	font-family: '푸른전남체R';
+	src: url("../../font/PureunJeonnam.ttf");
+}
+@font-face {
+	font-family: '푸른전남체M';
+	src: url("../../font/PureunJeonnam-Medium.ttf")
+}
+* {
+	font-family: '푸른전남체M', sans-serif;
+	color: #adbac7;
+	font-size: 15px;
+}
+body {
+	position: relative;
+	background-color: #22272e;
+	padding: 0;
+	margin: 0;
+}
+input[type="text"], textarea, pre {
+	font-family: '푸른전남체R', sans-serif;
+}
+input[type="password"] {
+	font-family: sans-serif;
+}
+
+/* header */
+header {
+	background-color: #2d333b;
+	position: relative;
+	margin: 0;
+	padding: 0;
+}
+header img {
+	height: 40px;
+}
+header a {
+	color: #cdd9e5;
+	text-decoration: none;
+}
+header a:first-of-type {
+	display: inline-block;
+	height: 40px;
+	margin: 5px 10px;
+}
+header a:last-of-type {
+	position: absolute;
+	right: 10px;
+	bottom: 5px;
+}
+header a:last-of-type:hover {
+	color: #cdd9e5b3;
+}
+
+/* nav */
+nav {
+	display: block;
+	position: fixed;
+	top: 80px;
+	left: 50px;
+	color: #c8d0d9; 
+	border: 1px solid #adbac790;
+}
+nav li, ul {
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+nav li {
+	margin: 5px 0;
+	padding-left: 20px;
+}
+nav ul {
+	margin: 10px 0;
+	border-bottom: 1px solid #adbac790;
+}
+nav ul:last-of-type {
+	border-bottom: none;
+}
+nav a {
+	display: inline-block;
+	padding: 10px 25px;
+	width: 150px;
+	box-sizing: border-box;
+	color: #c8d0d9;
+	border: 3px solid #00000000;
+}
+nav a span {
+	display: inline-block;
+	margin-left: 10px;
+}
+nav a i {
+	display: inline-block;
+	width: 20px;
+}
+nav a:hover {
+	border-right: 3px solid #adbac790;
+}
+nav a:hover span {
+	color: #c8d0d9a0;
+}
+
+/* section */
+section {
+	position: absolute;
+	left: 300px;
+}

@@ -1,0 +1,86 @@
+@charset "UTF-8";
+
+*{
+	box-sizing: border-box;
+}
+.insert_container {
+	width: 1080px;
+	margin: 0 auto;
+}
+.title {
+	width: 600px;
+	height: 40px;
+	font-size: 16px;
+}
+.productList {
+	width: 350px;
+	height: 40px;
+	margin-left: 15px;  
+}
+.title_line {
+	width: 100%;
+	margin-top: 50px;
+	margin-bottom: 10px;
+}
+.file_label {
+	float: right;
+}
+.content_box {
+	margin-bottom: 20px;
+}
+.content {
+	width: 100%;
+	height: 500px;
+	resize: none;
+	font-size: 20px;
+}
+.button_box {
+	float: right;
+}
+.button {
+	width: 80px;
+	height: 40px;
+}
+#insert_btn {
+	border: 1px solid #D5C2EE;			
+	background-color: #D5C2EE;
+	border-radius: 3px;
+}
+#cancel_btn {
+	border: 1px solid #FFBEBE;			
+	background-color: #FFBEBE;
+	border-radius: 3px;
+}
+.img {
+	display: inline;
+}
+input[type="button"]:hover {
+	cursor: pointer;
+}
+.filebox {
+	display:inline;
+}
+.filebox label {
+	display: inline-block;
+	padding: .6em .8em;
+	color: #fff;
+	font-size: inherit;
+	line-height: normal;
+	vertical-align: middle;
+	background-color: #FFD3B0;
+	cursor: pointer;
+	border: 1px solid #FFD3B0;
+	border-radius: .25em;
+	font-weight: 500;
+}
+
+.filebox input[type="file"] {  /* 파일 필드 숨기기 */
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip:rect(0,0,0,0);
+	border: 0;
+}

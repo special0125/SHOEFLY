@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.koreait.shoefly.dao.IndexDAO">
+	
+	<!-- 거래량 순으로 4개 -->
+	<select id="selectMostPopular" resultType="com.koreait.shoefly.dto.Product">
+		SELECT ROWNUM RN, PRODUCT_NO AS PRODUCTNO, PRODUCT_NAME AS PRODUCTNAME, PRICE, BRAND, IMAGE, STATE, 거래량
+ 		  FROM (SELECT P1.PRODUCT_NO, P1.PRODUCT_NAME, P1.PRICE, P1.BRAND, P1.IMAGE, P1.STATE, COUNT(C1.PRODUCT_DETAIL_NO) + COUNT(C2.PRODUCT_DETAIL_NO) AS 거래량
+          		  FROM PRODUCT_BUY C1
+          		  FULL OUTER JOIN PRODUCT_SELL C2 
+            	    ON 1 = 2
+          	  	  LEFT OUTER JOIN PRODUCT_DETAIL P2
+            		ON C1.PRODUCT_DETAIL_NO = P2.PRODUCT_DETAIL_NO
+            		OR C2.PRODUCT_DETAIL_NO = P2.PRODUCT_DETAIL_NO
+         		 RIGHT OUTER JOIN PRODUCT P1
+            		ON P1.PRODUCT_NAME = P2.PRODUCT_NAME
+         		 WHERE P1.STATE >= 0
+         		 GROUP BY P1.PRODUCT_NO, P1.PRODUCT_NAME, P1.PRICE, P1.BRAND, P1.IMAGE, P1.STATE
+         	     ORDER BY 거래량 DESC)
+ 		 WHERE ROWNUM &lt; 5
+	</select>
+	
+	<!-- 이름순으로 브랜드 4개 -->
+	<select id="selectRecommand" resultType="com.koreait.shoefly.dto.Product">
+		SELECT ROWNUM RN, PRODUCT_NO AS PRODUCTNO, PRODUCT_NAME AS PRODUCTNAME, BRAND, PRICE, IMAGE
+ 		 FROM PRODUCT
+		WHERE BRAND = 'Nike' <!-- 현재 브랜드 Nike, Jordan, Adidas, New Balance -->
+		  AND STATE = 0
+		  AND ROWNUM &lt; 5
+		ORDER BY PRODUCT_NAME
+	</select>
+	
+	
+</mapper>

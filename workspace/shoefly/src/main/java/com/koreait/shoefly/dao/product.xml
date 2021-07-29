@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.koreait.shoefly.dao.ProductDAO">
+
+	<!-- 전체 상품 갯수 조회 -->
+	<select id="countProduct" resultType="int">
+		SELECT COUNT(*)
+		  FROM PRODUCT
+	</select>
+	
+	<!-- 전체 상품 목록 조회 -->
+	<select id="selectAllList" resultType="com.koreait.shoefly.dto.Product">
+		SELECT D.PRODUCT_NO AS PRODUCTNO, D.PRODUCT_NAME AS PRODUCTNAME, D.PRICE, D.BRAND, D.IMAGE
+		  FROM (
+		  		SELECT ROWNUM AS RN, C.PRODUCT_NO, C.PRODUCT_NAME, C.PRICE, C.BRAND, C.IMAGE
+			      FROM ( SELECT DISTINCT B.PRODUCT_NO, B.PRODUCT_NAME, B.PRICE, B.BRAND, B.IMAGE
+			   		       FROM PRODUCT_DETAIL A INNER JOIN PRODUCT B
+			                 ON A.PRODUCT_NAME = B.PRODUCT_NAME 
+			              ORDER BY B.PRICE) C ) D
+		 WHERE D.RN BETWEEN #{beginRecord} AND #{endRecord}
+		 ORDER BY D.PRICE
+	</select>
+	
+	<!-- 조건 상품 갯수 조회 -->
+	<select id="countConditionProduct" resultType="int">
+		SELECT COUNT(*)
+		  FROM (SELECT DISTINCT B.PRODUCT_NO, B.PRODUCT_NAME, B.PRICE, B.BRAND, B.IMAGE
+		   		  FROM PRODUCT_DETAIL A INNER JOIN PRODUCT B
+		    		ON A.PRODUCT_NAME = B.PRODUCT_NAME
+			   <where>
+					<if test="productName != null or productName != ''.toString">
+							UPPER(B.PRODUCT_NAME) LIKE '%' || UPPER(#{productName}) || '%'
+			  		</if>
+			  		<if test="true">
+							AND B.BRAND IN (${brandsArray})
+				      	    AND A.PRODUCT_SIZE IN (${sizesArray})
+			  				AND B.PRICE BETWEEN ${minPrice} AND ${maxPrice}
+			  		</if>
+			   </where>
+				)
+	</select>
+	
+	<!-- 상품명, 사이즈, 브랜드, 가격 조회 -->
+	<select id="selectCondition" resultType="com.koreait.shoefly.dto.Product">
+		 SELECT D.PRODUCT_NO AS PRODUCTNO, D.PRODUCT_NAME AS PRODUCTNAME, D.PRICE, D.BRAND, D.IMAGE
+		   FROM (
+		   		 SELECT ROWNUM AS RN, C.PRODUCT_NO, C.PRODUCT_NAME, C.PRICE, C.BRAND, C.IMAGE
+		   		   FROM ( SELECT DISTINCT B.PRODUCT_NO, B.PRODUCT_NAME, B.PRICE, B.BRAND, B.IMAGE
+		   				    FROM PRODUCT_DETAIL A INNER JOIN PRODUCT B
+		    				  ON A.PRODUCT_NAME = B.PRODUCT_NAME 				  
+		  				 <where>
+		  				 <if test="productName != null or productName != ''.toString">
+ 								 UPPER(B.PRODUCT_NAME) LIKE '%' || UPPER(#{productName}) || '%'
+	 	   		   		 </if>
+	 	   		   		 <if test="true">
+		  						 AND B.BRAND IN (${brandsArray})
+		  		  				 AND A.PRODUCT_SIZE IN (${sizesArray})
+	 	   		   				 AND B.PRICE BETWEEN ${minPrice} AND ${maxPrice}
+	 	   		   		 </if>
+	 	   		   		 </where>
+	 	   		   			) C ) D
+			WHERE D.RN BETWEEN #{beginRecord} AND #{endRecord}
+			ORDER BY D.PRICE
+	</select>
+	
+	<!-- PRODUCT_NO별로 조회 -->
+	<select id="selectProductByProductNo" resultType="com.koreait.shoefly.dto.Product">
+		SELECT DISTINCT A.PRODUCT_NO AS productNo, A.PRODUCT_NAME AS productName, A.BRAND, A.PRICE, A.IMAGE, A.STATE
+		  FROM PRODUCT A INNER JOIN PRODUCT_DETAIL B
+            ON A.PRODUCT_NAME = B.PRODUCT_NAME
+		 WHERE PRODUCT_NO = #{param1}
+	</select>
+<!-- =================================가격조회================================= -->	
+	<!-- 비로그인시/ size와 제품명으로 즉시구매가 조회 -->
+	<select id="selectBuyPriceBySizeNoId" resultType="long">
+		SELECT MIN(A.PRICE) 
+		  FROM PRODUCT_SELL A INNER JOIN PRODUCT_DETAIL B
+		    ON A.PRODUCT_DETAIL_NO = B.PRODUCT_DETAIL_NO
+		 WHERE B.PRODUCT_SIZE = ${param1}
+		   AND B.PRODUCT_NAME = #{param2}
+           AND A.STATE = 1
+	</select>
+	
+	<!-- 비로그인시/ size와 제품명으로 즉시판매가 조회 -->
+	<select id="selectSellPriceBySizeNoId" resultType="long">
+		SELECT MAX(A.PRICE) 
+		  FROM PRODUCT_BUY A INNER JOIN PRODUCT_DETAIL B
+		    ON A.PRODUCT_DETAIL_NO = B.PRODUCT_DETAIL_NO
+		 WHERE B.PRODUCT_SIZE = ${param1}
+		   AND B.PRODUCT_NAME = #{param2}
+		   AND A.STATE = 0
+	</select>
+	
+	<!-- 로그인시/ size와 제품명으로 즉시구매가 조회 -->
+	<select id="selectBuyPriceBySize" resultType="long">
+		SELECT MIN(A.PRICE) 
+		  FROM PRODUCT_SELL A INNER JOIN PRODUCT_DETAIL B
+		    ON A.PRODUCT_DETAIL_NO = B.PRODUCT_DETAIL_NO
+		 WHERE B.PRODUCT_SIZE = ${param1}
+		   AND B.PRODUCT_NAME = #{param2}
+		   AND A.MEMBER_ID != #{param3}
+           AND A.STATE = 1
+	</select>
+	
+	<!-- 로그인시/ size와 제품명으로 즉시판매가 조회 -->
+	<select id="selectSellPriceBySize" resultType="long">
+		SELECT MAX(A.PRICE) 
+		  FROM PRODUCT_BUY A INNER JOIN PRODUCT_DETAIL B
+		    ON A.PRODUCT_DETAIL_NO = B.PRODUCT_DETAIL_NO
+		 WHERE B.PRODUCT_SIZE = ${param1}
+		   AND B.PRODUCT_NAME = #{param2}
+		   AND A.MEMBER_ID != #{param3}
+		   AND A.STATE = 0
+	</select>
+<!-- =============================================================================== -->		
+	<!-- 즉시구매시 판매테이블에서 PRODUCT_SELL_NO 조회 -->
+	<!-- 즉시 구매시 로그인은 필수이므로 본인의 아이디는 where절에서 제외  -->
+	<!-- 서로다른 멤버가 같은 상품을 같은 가격에 내놓았을 경우 POSTDATE순으로 조회하기위해 MIN(D.PRODUCT_SELL_NO)으로 조회 -->
+	<select id="selectProductSellNo" resultType="long">
+		SELECT MIN(D.PRODUCT_SELL_NO)
+	       FROM (
+	          	 SELECT C.PRODUCT_SELL_NO, C.MEMBER_ID, C.POSTDATE, C.PRICE
+	               FROM PRODUCT_SELL C
+	        	  WHERE C.PRICE = (SELECT MIN(A.PRICE)
+	                          		 FROM PRODUCT_SELL A INNER JOIN PRODUCT_DETAIL B
+	                           		   ON A.PRODUCT_DETAIL_NO = B.PRODUCT_DETAIL_NO
+	                         		WHERE B.PRODUCT_SIZE = ${param1}
+	                           		  AND B.PRODUCT_NAME = #{param2}
+                                      AND A.MEMBER_ID != #{param3}
+                                      AND A.STATE = 1
+	                        	   )
+	               AND C.PRODUCT_DETAIL_NO = (SELECT PRODUCT_DETAIL_NO
+	                                            FROM PRODUCT_DETAIL
+	                                           WHERE PRODUCT_SIZE = ${param1}
+	                                             AND PRODUCT_NAME = #{param2}
+	               							 )
+                   AND C.STATE = 1
+                   AND C.MEMBER_ID != #{param3}                
+	             ) D
+	      WHERE MEMBER_ID != #{param3}
+ 	</select>
+ 	
+	<!-- 구매 신청서 이동시 product 조회 -->
+	<select id="buyApplication" resultType="com.koreait.shoefly.dto.Product">
+		SELECT A.PRODUCT_NAME AS PRODUCTNAME, A.BRAND, A.PRICE, A.IMAGE, A.PRODUCT_NO as PRODUCTNO
+		  FROM PRODUCT A INNER JOIN PRODUCT_DETAIL B
+		    ON A.PRODUCT_NAME = B.PRODUCT_NAME
+		 WHERE A.PRODUCT_NAME = #{param1}
+		   AND B.PRODUCT_SIZE = ${param2}
+	</select>
+	
+	<!-- 로그인유저의 배송지 조회-->
+	<select id="selectMemberAddr" resultType="com.koreait.shoefly.dto.MemberAddress">
+		SELECT B.MEMBER_ADDRESS_NO AS memberAddressNo, B.NAME, B.ADDR1, B.ADDR2
+		  FROM MEMBER A INNER JOIN MEMBER_ADDRESS B 
+		    ON A.MEMBER_NO = B.MEMBER_NO
+		 WHERE A.MEMBER_NO = (SELECT MEMBER_NO
+		 					    FROM MEMBER
+		 					   WHERE MEMBER_ID = #{param1}
+		 				     )
+		   AND B.STATE = 0
+	</select>
+	
+	<!-- 현재 MEMBER_ADDRESS TABLE에서 MEMBER_ADDRESS_NO중 최대값 찾기 -->
+	<select id="maxMemberAddressNo" resultType="long">
+		SELECT MAX(MEMBER_ADDRESS_NO) AS maxMemberAddressNo
+		  FROM MEMBER_ADDRESS 
+		 WHERE STATE = 0
+	</select>
+	
+	<!-- 새로운 주소 등록 -->
+	<insert id="insertNewAddress">
+		INSERT INTO MEMBER_ADDRESS
+		VALUES (
+				MEMBER_ADDRESS_SEQ.NEXTVAL,
+				(SELECT MEMBER_NO
+				   FROM MEMBER
+				  WHERE MEMBER_ID = #{param1}
+				),
+				#{param2},
+				#{param3},
+				#{param4},
+				0
+				)
+	</insert>
+	
+	<!-- 새로운 주소 등록 (addr2 입력 안했을경우) -->
+	<insert id="insertNewAddressNoAddr2">
+		INSERT INTO MEMBER_ADDRESS
+		VALUES (
+				MEMBER_ADDRESS_SEQ.NEXTVAL,
+				(SELECT MEMBER_NO
+				   FROM MEMBER
+				  WHERE MEMBER_ID = #{param1}
+				),
+				#{param2},
+				#{param3},
+				NULL,
+				0
+				)
+	</insert>
+	
+	<!-- 구매 신청서 작성 -->
+	<insert id="insertBuyApplication">
+		INSERT INTO PRODUCT_BUY
+		VALUES (
+				PRODUCT_BUY_SEQ.NEXTVAL,
+			    #{param1},
+			    (SELECT PRODUCT_DETAIL_NO 
+			       FROM PRODUCT_DETAIL
+			      WHERE PRODUCT_SIZE = ${param2}
+			        AND PRODUCT_NAME = #{param3}
+			    ),
+			    ${param4},
+				${param5},
+			    SYSDATE,
+			    NULL,
+			    0 
+				)
+	</insert>
+	
+	<!-- 판매 신청서 작성 -->
+	<insert id="insertSellApplication">
+		INSERT INTO PRODUCT_SELL
+		VALUES (
+				PRODUCT_SELL_SEQ.NEXTVAL,
+			    #{param1},
+			    (SELECT PRODUCT_DETAIL_NO 
+			       FROM PRODUCT_DETAIL
+			      WHERE PRODUCT_SIZE = ${param2}
+			        AND PRODUCT_NAME = #{param3}
+			    ),
+			    ${param4},
+				${param5},
+			    SYSDATE,
+			    NULL,
+			    NULL,
+			    0 
+				)
+	</insert>
+	
+	<!-- 즉시구매시 구매테이블에 등록 -->
+	<insert id="insertBuy">
+		INSERT INTO PRODUCT_BUY
+		VALUES (
+				PRODUCT_BUY_SEQ.NEXTVAL,
+			    #{param1},
+			    (SELECT PRODUCT_DETAIL_NO 
+			       FROM PRODUCT_DETAIL
+			      WHERE PRODUCT_SIZE = ${param2}
+			        AND PRODUCT_NAME = #{param3}
+			    ),
+			    ${param4},
+				${param5},
+			    SYSDATE,
+			    SYSDATE,
+			    1 
+			   )
+	</insert>
+	
+	<!-- 구매테이블에 등록된 번호중 최근값(최대값조회) -->
+	<select id="selectMaxProductBuyNo" resultType="long">
+		SELECT MAX(PRODUCT_BUY_NO)
+		  FROM PRODUCT_BUY
+	</select>
+	
+	<!-- 구매시 판매테이블의 해당 상품을 찾아 구매연결시키기(update = 2, SELL_DATE에 오늘날짜), productBuyNo 연결 -->
+	<update id="updateSellProduct">
+		UPDATE PRODUCT_SELL
+		   SET SELLDATE = SYSDATE,
+		   	   STATE = 2,
+		   	   PRODUCT_BUY_NO = ${param1}
+	 	 WHERE PRODUCT_SELL_NO = ${param2}
+	</update>
+	
+	<!-- 즉시판매시 해당구매신청서의No 조회(PRODUCT_BUY 테이블의 PRODUCT_BUY_NO) -->
+	<!-- 서로다른 멤버가 같은 상품을 같은 가격에 구매신청서를 작성했을 경우 POSTDATE순으로 조회하기위해 MIN(PRODUCT_BUY_NO)으로 조회 -->
+	<select id="selectProductBuyNo" resultType="long">
+	SELECT MIN(PRODUCT_BUY_NO)
+	  FROM PRODUCT_BUY
+	 WHERE PRICE = (SELECT MAX(A.PRICE) 
+					  FROM PRODUCT_BUY A INNER JOIN PRODUCT_DETAIL B
+					    ON A.PRODUCT_DETAIL_NO = B.PRODUCT_DETAIL_NO
+					 WHERE B.PRODUCT_SIZE = ${param1}
+					   AND B.PRODUCT_NAME = #{param2}
+					   AND A.MEMBER_ID != #{param3}
+					   AND A.STATE = 0
+					)
+	   AND MEMBER_ID != #{param3}
+	   AND PRODUCT_DETAIL_NO = (SELECT PRODUCT_DETAIL_NO
+	    					      FROM PRODUCT_DETAIL
+	    					     WHERE PRODUCT_SIZE = ${param1}
+	    					       AND PRODUCT_NAME = #{param2}
+	   							)
+	   AND STATE = 0
+	</select>
+	
+	<!-- 판매테이블에 등록된 판매게시글의 번호 -->
+	<select id="selectMaxProductSellNo" resultType="long">
+		SELECT PRODUCT_SELL_NO
+		  FROM PRODUCT_SELL
+		 WHERE PRODUCT_BUY_NO = #{param1}
+	</select>
+	
+	<!-- 즉시판매시 판매테이블에 등록 -->
+	<insert id="insertSell">
+		INSERT INTO PRODUCT_SELL
+		VALUES (
+				PRODUCT_SELL_SEQ.NEXTVAL,
+                #{param1},
+                (SELECT PRODUCT_DETAIL_NO 
+			       FROM PRODUCT_DETAIL
+			      WHERE PRODUCT_NAME = #{param2}
+			        AND PRODUCT_SIZE = ${param3}
+			    ),
+                ${param4},
+                #{param5},
+                SYSDATE,
+                SYSDATE,
+                ${param6},
+                2
+		)
+	</insert>
+	
+	<select id="selectProductDetailInfo1" resultType="string">
+		SELECT PRODUCT_NAME
+		  FROM PRODUCT_DETAIL
+		 WHERE PRODUCT_DETAIL_NO = #{param1}
+	</select>
+	
+	<select id="selectProductDetailInfo2" resultType="int">
+		SELECT PRODUCT_SIZE
+		  FROM PRODUCT_DETAIL
+		 WHERE PRODUCT_DETAIL_NO = #{param1}
+	</select>
+	
+	<select id="selectMemberAddrNoInSell" resultType="long">
+		SELECT MEMBER_ADDRESS_NO
+		  FROM PRODUCT_SELL
+		 WHERE PRODUCT_SELL_NO = #{param1}
+	</select>
+	
+	<select id="selectMemberAddrNoInBuy" resultType="long">
+		SELECT MEMBER_ADDRESS_NO
+		  FROM PRODUCT_BUY
+		 WHERE PRODUCT_BUY_NO = #{param1}
+	</select>
+	
+	<select id="selectPriceinSell" resultType="long">
+		SELECT PRICE
+		  FROM PRODUCT_SELL
+		 WHERE PRODUCT_SELL_NO = #{param1}
+	</select>
+	
+	<select id="selectPriceinBuy" resultType="long">
+		SELECT PRICE
+		  FROM PRODUCT_BUY
+		 WHERE PRODUCT_BUY_NO = #{param1}
+	</select>
+	
+	<select id="selectSelldate" resultType="date">
+		SELECT SELLDATE
+		  FROM PRODUCT_SELL
+		 WHERE PRODUCT_SELL_NO = #{param1}
+	</select>
+	
+	<select id="selectMemberAddrByProductSellNo" resultType="com.koreait.shoefly.dto.MemberAddress">
+		SELECT NAME, ADDR1, ADDR2
+		  FROM MEMBER_ADDRESS
+		 WHERE MEMBER_ADDRESS_NO = #{param1}
+	</select>
+	
+	<!-- 판매시 구매테이블의 해당 상품을 찾아 판매연결시키기(update = 2, SELL_DATE에 오늘날짜) -->
+	<update id="updateBuyProduct">
+		UPDATE PRODUCT_BUY
+		   SET STATE = 1,
+		   	   BUYDATE = SYSDATE
+	 	 WHERE PRODUCT_BUY_NO = #{param1}
+	</update>
+	
+	<!-- 판매완료 후 판매게시글 조회 -->
+	<select id="selectProductSellByNo" resultType="long">
+		SELECT PRODUCT_DETAIL_NO
+		  FROM PRODUCT_SELL 
+		 WHERE PRODUCT_SELL_NO = #{param1}
+	</select>
+	
+	<!-- 구매완료 후 구매게시글 조회 -->
+	<select id="selectProductBuyByNo" resultType="long">
+		SELECT PRODUCT_DETAIL_NO
+		  FROM PRODUCT_BUY 
+		 WHERE PRODUCT_BUY_NO = #{param1}
+	</select>
+	
+</mapper>
